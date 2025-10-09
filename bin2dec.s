@@ -1,1 +1,62 @@
+//============================================================================
+//  Mitch Merrell, Osvaldo Medina Hernandez | Bin2Dec Project Group 5
+//  CS3B - bin2dec function
+//  Date Created: 10/08/2025
+//  Date Last Modified: 10/08/2025
+//============================================================================
 
+.global _start
+    .text                   // code body start
+
+//****************************************************************************
+//  bin2dec function
+//============================================================================
+//  Overview: Converts a given binary number, as a string, into its equivalent 
+//  decimal value and displays it to the console.
+//----------------------------------------------------------------------------
+//  The user will be able to use their keyboard to input a binary number up
+//  to 16 digits, as well as combining those digits with the following
+//  characters into a single, continuous string:
+//      'c' to clear (or ignore) the all previous digits and commands in the
+//          string
+//      'q' to immediately terminate the program
+//  When ready to execute the conversion, the user will press the 'Enter' key
+//  to submit the entire string. The string is then processed by this function
+//  and the first continuous sequence of 16 or less binary digits not
+//  immediately preceeded by a 'c', 'q', or 'Enter' will be converted into 
+//  its equivalent decimal value. If 'c' or 'q' is present within the string,
+//  the program will either ignore the previous input or terminate the program.
+//  i.e. an input of '1101101c1001' will produce a decimal '9' since the 
+//  presence of a 'c' caused the program to discard the preceeding '1101101'.
+//============================================================================
+//  Input: Calls getstring function to receive keyboard input from user
+//  Output: Calls putstring to display equivalent decimal value to the console
+//============================================================================
+//  Registers:
+//  X0: 
+//  X1:
+//  X2:
+//  X8:
+//****************************************************************************
+//  Function Algorithm/Pseudocode:
+//      ALGORITHM GOES HERE
+//============================================================================
+    .data
+.end                        // code body end    
+
+// all functions/,acros must be documented with header comments that describe
+// functionality, inpuyts, outputs, and registers used (see lab descriptions
+// that require you to write functions for examples)
+
+// all labels must be left-aligned not tabbed in
+
+// the .global and .end directives must be left-aligned while all other
+// directives (e.g. .text, .data) must be tabbed once
+
+// All code is tabbed once (use 4 spaces for tabs)
+
+// Each line of code must be commented and instructions and registers must be 
+// upper case e.g. MOV X0, x1  not mov x0, x1)
+
+// Label/variable namnes must adhere to Hungarian Notation
+ 
