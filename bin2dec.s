@@ -2,7 +2,7 @@
 //  Mitch Merrell, Osvaldo Medina Hernandez | Bin2Dec Project Group 5
 //  CS3B - bin2dec function
 //  Date Created: 10/08/2025
-//  Date Last Modified: 10/08/2025
+//  Date Last Modified: 10/09/2025
 //============================================================================
 
 .global _start
