@@ -39,7 +39,40 @@
 //  X8:
 //****************************************************************************
 //  Function Algorithm/Pseudocode:
-//      ALGORITHM GOES HERE
+//      1. Get input from user
+//      2. clear input_length and number_length counters to 0
+//      3. clear the number string buffer
+//      4. while input_length < 64
+//          a. check the current character and increment pointer
+//          b. if it's a '0' '1' AND number_length counter < 16:
+//              i. store the current character in the number string buffer
+//              ii. increment the number_length counter
+//          c. if it's a 'q':
+//              i. clear the input string
+//              ii. terminate the program
+//          d. if it's a 'c':
+//              i. clear the number string buffer
+//              ii. set the number_length counter to 0
+//          e. if it's an 'Enter':
+//              i. exit the loop
+//          f. increment input_length counter
+//          g. jump back to the beginning of length
+//      5. Call cstr2int with the number string as a parameter
+//      6. Call int2cstr and pass converted number as a parameter
+//      7. check first character for sign
+//      8. if it's a '-':
+//          a. pass "->" to putstring
+//          b. otherwise, pass "->+" to putstring
+//      9. pass converted number to putstring
+//      10. wait for additional input + 'Enter'
+//          a. read input
+//          b. loop through string given
+//              i. check current char and increment pointer
+//              ii. if it's a 'c':
+//                  1. clear the input string
+//                  2. go back to the beginning of program
+//              iii. if it's a 'q':
+//                  1. terminate program
 //============================================================================
     .data
 .end                        // code body end    
