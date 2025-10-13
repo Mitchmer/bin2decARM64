@@ -45,6 +45,13 @@ getstring:
 	CBZ	X21, finish		// If no bytes are left then jumps to finish
 
 	MOV	X22, #0			// index counter
+
+	MOV	X1, X19
+	MOV	X2, X21
+	MOV	X3, X20
+	BL	check_key
+	
+	MOV	X21, X2
 	
 newline_check:
 	
