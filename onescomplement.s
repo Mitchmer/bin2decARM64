@@ -1,69 +1,60 @@
 //============================================================================
 //  Mitch Merrell
-//  CS3B - Title
-//  Date Created: XX/XX/XXXX
-//  Date Last Modified: XX/XX/XXXX
-//===== if just a function, don't include this next part =====================
-//  *** PROGRAM DESCRIPTION ****
-//  Algorithm/Pseudocode:
-//      ALGORITHM GOES HERE
+//  CS3B - onescomplement function
+//  Date Created: 10/12/2025
+//  Date Last Modified: 10/13/2025
 //============================================================================
 
-.global onescomplement
+.global onescomplement      // provide global access to function
     .text                   // code body start
 
 //****************************************************************************
 //  onescomplement
 //============================================================================
-//  Converts a given cstring to the ones complement, by changing all '0's to
+//  Converts a given cstring to its one's complement, by changing all '0's to
 //  '1's and all '1's to '0's
 //============================================================================
 //  Input: N/A
 //  Output: N/A
 //============================================================================
 //  Registers:
-//  X0: pointer to a cstring 
-//  X1:
-//  X2:
-//  X8:
+//  X0: pointer to a binary cstring 
+//  X1: loads character for conversion
+//  X7: preserves original pointer for modifcation
 //****************************************************************************
 //  Function Algorithm/Pseudocode:
-//      ALGORITHM GOES HERE
+//      1. save original pointer for modification
+//      2. loop the following:
+//          a. load current character and check if null:
+//              i. if null, exit loop
+//          b. check if character is an ASCII '0'
+//              i. if true, replace it with an ASCII '1'
+//                  1. increment pointer and jump back to beginning of loop
+//              ii. otherwise its '1' and replace with ASCII '0'
+//                  1. increment pointer and jump back to beginning of loop
+//      3. return from function
 //============================================================================
-onescomplement:
-    // while current char != '\0'
+onescomplement:             // function access point
     MOV X7, X0              // preserve pointer
-process_loop:
-    LDRB W2, [X7]        // load first char and increment pointer
-    CMP W2, #0               // check if it's null
-    B.EQ endloop            // iftrue, exit loop
-    CMP W2, #'0'            // check if it's ASCII 0
-    B.NE process_one          // if not, jump to next check
-    MOV W2, #'1'            // Otherwise, move an ASCII 1 to prepare to store
-    STRB W2, [X7], #1           // store byte and increment pointer
+
+process_loop:               // loop to process binary string
+    LDRB W1, [X7]           // load first char
+    CMP W1, #0              // check if it's null
+    B.EQ endloop            // if true, exit loop
+    CMP W1, #'0'            // check if it's ASCII '0'
+    B.NE process_one        // if not, jump to next check
+    MOV W1, #'1'            // Otherwise, move an ASCII '1' to prepare to store
+    STRB W1, [X7], #1       // store byte and increment pointer
     B process_loop          // jump back to beginning of loop
-process_one:
-    MOV W2, #'0'            // otherwise prepare an ASCII 1
-    STRB W2, [X7], #1
-    B process_loop
-endloop:
-    RET LR
-    .data
+
+process_one:                // section to process a '1'
+    MOV W1, #'0'            // prepare an ASCII '0'
+    STRB W1, [X7], #1       // replace '1' with a '0'
+    B process_loop          // jump back to beginning of loop
+
+endloop:                    // end of loop
+    RET LR                  // return from function
+
+    .data                   // data section start
 .end                        // code body end    
 
-// all functions/,acros must be documented with header comments that describe
-// functionality, inpuyts, outputs, and registers used (see lab descriptions
-// that require you to write functions for examples)
-
-// all labels must be left-aligned not tabbed in
-
-// the .global and .end directives must be left-aligned while all other
-// directives (e.g. .text, .data) must be tabbed once
-
-// All code is tabbed once (use 4 spaces for tabs)
-
-// Each line of code must be commented and instructions and registers must be 
-// upper case e.g. MOV X0, x1  not mov x0, x1)
-
-// Label/variable namnes must adhere to Hungarian Notation
- 
