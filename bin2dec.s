@@ -92,4 +92,3 @@
 // upper case e.g. MOV X0, x1  not mov x0, x1)
 
 // Label/variable namnes must adhere to Hungarian Notation
- 
