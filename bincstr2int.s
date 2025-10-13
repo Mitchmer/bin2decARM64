@@ -61,9 +61,13 @@ bincstr2int:
     MOV X1, #0                  // Clear the X1 register
     MOV X2, #0                  // Clear the X2 register
     MOV X7, #0                  // Set X7 to 0 (false) for "positive"
-    LDRB W1, [X0], #1           // load first char into X1 
+    LDRB W1, [X0]               // load first char into X1 
     CMP W1, #'1'                // check if first char is '1'
     B.NE endif_negative         // if not a '1', jump to the conversion loop label
+    STR LR, [SP, #-16]!
+    BL onescomplement            // if it is negative, swap digits to ones complement
+    LDR LR, [SP], #16
+    LDRB W1, [X0]
     MOV X7, #1                  // else, set X7 to 1 (true) for "negative"
     //LDRB W1, [X0], #1           // load next character after hyphen and increment X0 pointer by 1
 
@@ -84,13 +88,17 @@ convert_loop:
     LDRB W1, [X0], #1           // load next char and increment pointer
     CMP W1, #0                  // check if the char is null (ASCII value equal to zero)
     B.NE convert_loop           // if it isn't, go back to beginning of loop
-
     CMP X7, #1                  // check if X7 is "True" (1), meaning the number is negative
-    B.EQ prepare_return         // if it's negative, go straight to returning from the function 
-    NEGS X2, X2                 // otherwise, negate X2
-    B.VS overflow               // if the negation sets the overflow flag, jump to overflow label
+    B.EQ prepare_negative         // if it's negative, go straight to returning from the function 
+    
+    NEGS X2, X2
+    B.VS overflow
+    B prepare_return
+   
+prepare_negative:
+    SUB X2, X2, #1              // subtract a one for 2's complement
 
-prepare_return:
+prepare_return: 
     MOV X0, X2                  // move X2 into X0 for returning the converted number
     B end_function              // jump to the end of function
 

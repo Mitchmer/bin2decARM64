@@ -78,14 +78,14 @@
 //============================================================================
 _start:    
     LDR X0, =szTestString   // load test string into bincstr2int
-    BL onescomplement
+    BL bincstr2int      
 
     // end program
     MOV X0, #0          // prepare return code 0
     MOV X8, #SYS_EXIT   // prepare system call code for program exit
     SVC 0               // Linux supervisor call to terminate program
     .data
-szTestString: .asciz "0101" // -3
+szTestString: .asciz "1101" // -3
 .end                        // code body end    
 
 // all functions/,acros must be documented with header comments that describe
