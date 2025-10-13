@@ -9,7 +9,7 @@
     .text                       // code body start
     .EQU    BASE_NUMBER, 2      // specifies base number for conversion
 //****************************************************************************
-//  cstr2int function
+//  bincstr2int function
 //============================================================================
 //  Provided a pointer to a C-String representing a valid signed integer,
 //  converts it to a quad integer. If under/overflow occurs, then the overflow
@@ -62,8 +62,8 @@ cstr2int:
     MOV X2, #0                  // Clear the X2 register
     MOV X7, #0                  // Set X7 to 0 (false) for "positive"
     LDRB W1, [X0], #1           // load first char into X1 
-    CMP W1, #'-'                // check if first char is '-'
-    B.NE endif_negative         // if not a '-', jump to the conversion loop label
+    CMP W1, #'1'                // check if first char is '1'
+    B.NE endif_negative         // if not a '1', jump to the conversion loop label
     MOV X7, #1                  // else, set X7 to 1 (true) for "negative"
     LDRB W1, [X0], #1           // load next character after hyphen and increment X0 pointer by 1
 
