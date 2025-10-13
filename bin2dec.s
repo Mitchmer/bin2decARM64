@@ -7,6 +7,7 @@
 
 .global _start
     .text                   // code body start
+    .EQU SYS_EXIT, 93      // alias for the call code to terminate
 
 //****************************************************************************
 //  bin2dec function
@@ -75,7 +76,16 @@
 //              iii. if it's a 'q':
 //                  1. terminate program
 //============================================================================
+_start:    
+    LDR X0, =szTestString   // load test string into bincstr2int
+    BL onescomplement
+
+    // end program
+    MOV X0, #0          // prepare return code 0
+    MOV X8, #SYS_EXIT   // prepare system call code for program exit
+    SVC 0               // Linux supervisor call to terminate program
     .data
+szTestString: .asciz "0101" // -3
 .end                        // code body end    
 
 // all functions/,acros must be documented with header comments that describe

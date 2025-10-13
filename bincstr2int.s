@@ -5,7 +5,7 @@
 //  Date Last Modified: 10/02/2025
 //============================================================================
 
-.global cstr2int                // provide global access to function
+.global bincstr2int                // provide global access to function
     .text                       // code body start
     .EQU    BASE_NUMBER, 2      // specifies base number for conversion
 //****************************************************************************
@@ -57,7 +57,7 @@
 //          c. Add X2 to X2 to set overflow flag
 //      8. Return from function
 //============================================================================
-cstr2int:
+bincstr2int:
     MOV X1, #0                  // Clear the X1 register
     MOV X2, #0                  // Clear the X2 register
     MOV X7, #0                  // Set X7 to 0 (false) for "positive"
@@ -65,7 +65,7 @@ cstr2int:
     CMP W1, #'1'                // check if first char is '1'
     B.NE endif_negative         // if not a '1', jump to the conversion loop label
     MOV X7, #1                  // else, set X7 to 1 (true) for "negative"
-    LDRB W1, [X0], #1           // load next character after hyphen and increment X0 pointer by 1
+    //LDRB W1, [X0], #1           // load next character after hyphen and increment X0 pointer by 1
 
 endif_negative:
     MOV X6, #BASE_NUMBER        // store 10 in X6 for multiplication
