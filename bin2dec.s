@@ -78,14 +78,22 @@
 //============================================================================
 _start:    
     LDR X0, =szTestString   // load test string into bincstr2int
-    BL bincstr2int      
+    BL bincstr2int
+    LDR X1, =szBuffer       // load buffer for int2cstr
+    BL int2cstr
+    LDR X0, =szBuffer       // load buffer for putstring
+    BL putstring
+    LDR X0, =szEOL          // load newline for putstring
+    BL putstring
 
     // end program
-    MOV X0, #0          // prepare return code 0
-    MOV X8, #SYS_EXIT   // prepare system call code for program exit
-    SVC 0               // Linux supervisor call to terminate program
+    MOV X0, #0              // prepare return code 0
+    MOV X8, #SYS_EXIT       // prepare system call code for program exit
+    SVC 0                   // Linux supervisor call to terminate program
     .data
-szTestString: .asciz "1101" // -3
+szTestString: .asciz "0111111111111111" // -32768
+szBuffer: .skip 32          // buffer for string output
+szEOL: .asciz "\n"          // newline character for display 
 .end                        // code body end    
 
 // all functions/,acros must be documented with header comments that describe
