@@ -59,10 +59,10 @@
 //              i. exit the loop
 //          g. increment input_length counter
 //          h. jump back to the beginning of length
-//      5. Call cstr2bin with the number string as a parameter
-//      6. Call binint2cstr and pass converted number as a parameter
-//      7. Check first character for sign
-//      8. if it's a '-':
+//      5. Call bincstr2int with the number string as a parameter
+//      6. Call int2cstr and pass converted number as a parameter
+//      7. Check sign of number
+//      8. if it's negative:
 //          a. pass "->" to putstring
 //          b. otherwise, pass "->+" to putstring
 //      9. pass converted number to putstring
