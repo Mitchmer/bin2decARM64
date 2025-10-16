@@ -3,4 +3,5 @@
 *.exe
 *.lib
 *.a
+*.backup
 Makefile
