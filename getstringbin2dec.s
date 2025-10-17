@@ -24,9 +24,9 @@
 //***************************************************************************************
 
 .text
-.global getstring
+.global getstringbin2dec
 
-getstring:
+getstringbin2dec:
 
 	STP	X19, X20, [SP, #-16]!	// push X19 and X20 to the stack
 	STP	X21, X30, [SP, #-16]!	// push X21 and LR to stack
@@ -77,5 +77,5 @@ finish:
 
 	MOV 	X0, X19			// restores X0 to point at the buffer
 	
-	LDP	X29, X30, [sp], #16	// adjusts the stack by restoring LR
-	ret
+	LDP	X29, X30, [SP], #16	// adjusts the stack by restoring LR
+	RET

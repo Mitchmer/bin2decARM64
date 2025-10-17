@@ -8,6 +8,7 @@
 .global _start
     .text                   // code body start
     .EQU SYS_EXIT, 93      // alias for the call code to terminate
+    .EQU BUFFER_SIZE, 64    // alias for the size of the buffer
 
 //****************************************************************************
 //  bin2dec function
@@ -77,24 +78,33 @@
 //                  1. terminate program
 //============================================================================
 _start:    
-    LDR X0, =szTestString   // load test string into bincstr2int
-    BL bincstr2int
-    LDR X1, =szBuffer       // load buffer for int2cstr
-    BL int2cstr
-    LDR X0, =szBuffer       // load buffer for putstring
-    BL putstring
-    LDR X0, =szEOL          // load newline for putstring
-    BL putstring
+    // get input from user
+    // call getstring to get user input
+input_loop: 
+    LDR XO, =szBinaryInputPrompt    // prompt user for input
+    BL putstring                    // display prompt
+    LDR X0, =szBuffer               // load buffer into X0 for getstring input
+    MOV X1, #BUFFER_SIZE            // prepare buffer size for getstring
+    BL getstringbin2dec             // call getstring for input
+
+    // TODO : something is returned, maybe in X0?
+    // TODO : X0 is loaded with the binary c-string before calling bincstr2int 
+    BL bincstr2int                  // convert binary c-string to integer
+    BL int2cstr                     // convert integer to a c-string
+    // TODO : need to display "->+" or "->"
+    MOV X0, X1                      // move buffer to display
+    BL putstring                    // display c-string number
 
     // end program
-    MOV X0, #0              // prepare return code 0
-    MOV X8, #SYS_EXIT       // prepare system call code for program exit
-    SVC 0                   // Linux supervisor call to terminate program
+    MOV X0, #0                      // prepare return code 0
+    MOV X8, #SYS_EXIT               // prepare system call code for program exit
+    SVC 0                           // Linux supervisor call to terminate program
     .data
 szTestString: .asciz "0111111111111111" // -32768
-szBuffer: .skip 32          // buffer for string output
-szEOL: .asciz "\n"          // newline character for display 
-.end                        // code body end    
+szBinaryInputPrompt: .asciz "Enter a sequence of binary digits, 'c' to clear, and/or 'q' to quit: "
+szBuffer: .skip BUFFER_SIZE         // buffer for string input
+szEOL: .asciz "\n"                  // newline character for display 
+.end                                // code body end    
 
 // all functions/,acros must be documented with header comments that describe
 // functionality, inpuyts, outputs, and registers used (see lab descriptions

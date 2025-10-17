@@ -1,3 +1,5 @@
+.global check_key
+
 // Pseudocode:
 //	Once the user inputs a c-string and hits enter it 
 //	go through the getstring and be checked through
