@@ -80,8 +80,8 @@
 _start:    
     // get input from user
     // call getstring to get user input
-input_loop: 
-    LDR XO, =szInitialInputPrompt   // prompt user for input
+input_loop:
+    LDR X0, =szInitialInputPrompt 
     BL putstring                    // display prompt
 
     // TODO : remove comments after getstring completion
@@ -106,9 +106,10 @@ input_loop:
 
 endif_negative:
     MOV X0, X19                     // prepare integer to convert to c-string
-    LDR X1, =szIntegerOutput        // load integer output buffer 
+    LDR X20, =szIntegerBuffer        // load integer output buffer 
+    MOV X1, X20                     // prepare buffer for int2cstr
     BL int2cstr                     // convert integer to cstring
-    MOV X0, X1                      // prepare output string for display
+    MOV X0, X20                      // prepare output string for display
     BL putstring                    // display number
     LDR X0, =szEOL                  // prepare newline character for display
     BL putstring                    // display newline character
@@ -122,10 +123,11 @@ endif_negative:
 
     .data
 
-szTestString: .asciz "0111111111111111" // -32768
+szTestString: .asciz "1000000000000000" // -32768
 szInitialInputPrompt: .asciz "Enter a sequence of binary digits, 'c' to clear, and/or 'q' to quit: "
-szArrow: .asciz "->"
+szArrow: .asciz " -> "
 szPlus: .asciz "+"
+szArrowBuffer: .skip 4
 szBinaryBuffer: .skip BUFFER_SIZE   // buffer for string input
 szIntegerBuffer: .skip BUFFER_SIZE  // buffer for integer output
 szEOL: .asciz "\n"                  // newline character for display 
