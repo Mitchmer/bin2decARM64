@@ -81,29 +81,55 @@ _start:
     // get input from user
     // call getstring to get user input
 input_loop: 
-    LDR XO, =szBinaryInputPrompt    // prompt user for input
+    LDR XO, =szInitialInputPrompt   // prompt user for input
     BL putstring                    // display prompt
-    LDR X0, =szBuffer               // load buffer into X0 for getstring input
-    MOV X1, #BUFFER_SIZE            // prepare buffer size for getstring
-    BL getstringbin2dec             // call getstring for input
+
+    // TODO : remove comments after getstring completion
+    //LDR X0, =szBinaryBuffer         // load buffer into X0 for getstring input
+    //MOV X1, #BUFFER_SIZE            // prepare buffer size for getstring
+    //BL getstringbin2dec             // call getstring for input
+
+    // TODO : delete this test section after getstring completion
+    LDR X0, =szTestString
 
     // TODO : something is returned, maybe in X0?
-    // TODO : X0 is loaded with the binary c-string before calling bincstr2int 
+    // TODO : X0 is loaded with the binary c-string before calling bincstr2int
+
     BL bincstr2int                  // convert binary c-string to integer
-    BL int2cstr                     // convert integer to a c-string
-    // TODO : need to display "->+" or "->"
-    MOV X0, X1                      // move buffer to display
-    BL putstring                    // display c-string number
+    MOV X19, X0                     // preserve integer
+    LDR X0, =szArrow                // prepare arrow for display
+    BL putstring                    // display arrow
+    CMP X19, XZR                    // check the sign of the number
+    B.LT endif_negative             // skip sign display if less than
+    LDR X0, =szPlus                 // else load a plus sign
+    BL putstring                    // display the plus sign
+
+endif_negative:
+    MOV X0, X19                     // prepare integer to convert to c-string
+    LDR X1, =szIntegerOutput        // load integer output buffer 
+    BL int2cstr                     // convert integer to cstring
+    MOV X0, X1                      // prepare output string for display
+    BL putstring                    // display number
+    LDR X0, =szEOL                  // prepare newline character for display
+    BL putstring                    // display newline character
+
+    // TODO : implement post key prompt and check
 
     // end program
     MOV X0, #0                      // prepare return code 0
     MOV X8, #SYS_EXIT               // prepare system call code for program exit
     SVC 0                           // Linux supervisor call to terminate program
+
     .data
+
 szTestString: .asciz "0111111111111111" // -32768
-szBinaryInputPrompt: .asciz "Enter a sequence of binary digits, 'c' to clear, and/or 'q' to quit: "
-szBuffer: .skip BUFFER_SIZE         // buffer for string input
+szInitialInputPrompt: .asciz "Enter a sequence of binary digits, 'c' to clear, and/or 'q' to quit: "
+szArrow: .asciz "->"
+szPlus: .asciz "+"
+szBinaryBuffer: .skip BUFFER_SIZE   // buffer for string input
+szIntegerBuffer: .skip BUFFER_SIZE  // buffer for integer output
 szEOL: .asciz "\n"                  // newline character for display 
+
 .end                                // code body end    
 
 // all functions/,acros must be documented with header comments that describe
