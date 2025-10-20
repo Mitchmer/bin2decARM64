@@ -1,71 +1,64 @@
-// Psuedocode:
-//	After the code has been run and outputted this will 
-//	be the post conditions given to the user.
-//	Options given:
-//	     Q - quit the program
-//	     C - clear the buffer and be ready for a new input
-//		 from the user
-
+// Set up the information on the stack
+// Then await for an input
+// Reads only one char from the user
+// If char is - 'q' then shut down program
+// If char is - 'c' then proceed to clear the buffer
+// else - awaits for a valid input again
+// 
+//	clear_buffer: 
+//		 Goes through each char of the buffer
+//		 Writes the value of 0 at the every positon of the buffer
+//		Continues until the entire buffer is cleared
+//	Afterwards returns back to the program
+//	If 'q' - program ends completely 
+//
 .data
-newline: .asciz "\n"
-buffer: .skip 24
-post_opt: .asciz "Options: c to clear, q to quit:  "
-quit_msg: .asciz "Program has ended\n"
+flush_char:    .byte 0
 
 .text
- .global post_key
+.global post_key
 
 post_key:
-	STP	X29, X30, [SP, #-16]!   // SAve frame pointer and ret address
-	STP 	X19, X20, [SP, #-16]!   // Save called refisters
-	MOV	X19, SP			// X19 = buffer pointer
+    	STP X29, X30, [SP, #-16]!   	// Save the frame pointer and return address on stack
+    	MOV X29, SP			// Set up new frame pointer
 	
+wait_input:
+       	MOV X0, SP                  	// Temporary buffer on stack
+    	MOV X1, #2                  	// Read max 2 bytes 
+    	BL getstring                	// Call getstring
 
-post_cond:
-	
-	MOV 	X0, #1
-	LDR	X1, =post_opt
-	MOV	X2, #32
-	MOV	X8, #64
-	SVC	0
+    	LDRB W4, [SP]               	// Load entered character
 
-	MOV	X0, #0
-	MOV	X1, X19
-	MOV	X2, #1
-	MOV	X8, #63
-	SVC	0
+    	
+    	CMP W4, #'q'			// compares to 'q'
+    	BEQ quit_program		// If equal jump to quit_program
 
-	LDRB	W0, [X19]
-	
+       	CMP W4, #'c'			// compare to 'c'
+    	BEQ clear_buffer		// If equal jump to clear_buffer
 
-	// Checks for 'c' - clear buffer
-	CMP	W0, #'c'
-	B.EQ	clear
-	
-	// Checks for 'q' - quit program
-	CMP	W0, #'q'
-	B.EQ	quit
+      	B wait_input			// else jump to wait_input
 
-	B	finish	
+clear_buffer:
+       	MOV X5, X2                  	// X2 = pointer to buffer
+    	MOV X6, #0                  	// Zero
+    	MOV X7, #0                  	// Index
+clear_loop:
+    	LDRB W8, [X5, X7]           	// Load byte 
+    	STRB W6, [X5, X7]           	// Set byte to 0
+    	ADD X7, X7, #1
+    	CMP X7, X3                   	// X3 = buffer length
+    	B.LT clear_loop
 
-clear:
-	MOV	X2, #0	
-	RET
-quit:
-	MOV	X0, #1
-	LDR	X1, =quit_msg
-	MOV	X2, #30
-	MOV	X8, #64
-	
-	SVC 	0
+	B post_exit
 
-	B	exit
-finish:
-	LDP	X19, X20, [SP], #16	// Restores called registers
-	LDP	X29, X30, [SP], #16	// Restores the pointer and address
-	RET
+post_exit:
+    	// Return to main to loop again
+    	LDP X29, X30, [SP], #16
+    	RET
 
-exit:
-	MOV	X8, #93
-	MOV	X0, #0
-	SVC	0
+quit_program:
+    	// Exit program
+    	MOV X8, #93                 
+    	MOV X0, #0                     	
+	SVC 0
+
