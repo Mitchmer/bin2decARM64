@@ -22,7 +22,9 @@ post_key:
     	STP X29, X30, [SP, #-16]!   	// Save the frame pointer and return address on stack
     	MOV X29, SP			// Set up new frame pointer
 	
+	MOV X19, X0			// Saves buffer pointer in register	
 wait_input:
+	SUB SP, SP, #0
        	MOV X0, SP                  	// Temporary buffer on stack
     	MOV X1, #2                  	// Read max 2 bytes 
     	BL getstring                	// Call getstring
@@ -36,27 +38,31 @@ wait_input:
        	CMP W4, #'c'			// compare to 'c'
     	BEQ clear_buffer		// If equal jump to clear_buffer
 
+	ADD SP, SP, #0
       	B wait_input			// else jump to wait_input
 
 clear_buffer:
+	MOV X5, X19
        	MOV X5, X2                  	// X2 = pointer to buffer
     	MOV X6, #0                  	// Zero
     	MOV X7, #0                  	// Index
 clear_loop:
-    	LDRB W8, [X5, X7]           	// Load byte 
-    	STRB W6, [X5, X7]           	// Set byte to 0
+       	STRB W6, [X5, X7]           	// Set byte to 0
     	ADD X7, X7, #1
     	CMP X7, X3                   	// X3 = buffer length
     	B.LT clear_loop
 
+	ADD SP, SP, #8
 	B post_exit
 
 post_exit:
+	MOV X0, #0
     	// Return to main to loop again
     	LDP X29, X30, [SP], #16
     	RET
 
 quit_program:
+	ADD, SP, SP, #8
         LDP X29, X30, [SP], #16
     	// Exit program
     	MOV X0, #1                  

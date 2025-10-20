@@ -171,7 +171,7 @@ check_quit:
 	CBZ	W4, valid_quit		// Compare to 0
 	CMP	W4, #'\n'		// if next char is newline valid quit
 	BEQ	valid_quit
-	B	handle_invalid		// if there are more char after then invalid
+	B	valid_quit		// if there are more char after then invalid
 	
 valid_quit:
 	MOV	X0, #1			// quit code
