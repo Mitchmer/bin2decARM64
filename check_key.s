@@ -10,13 +10,25 @@
 //	Saved the frame pointer and return address onto the stack
 //	Sets a new frame pointer
 //	Store max_length at a temp register
-//	Char index = 0 
-//	binary count = 0
+//	
+//	Initilaized - 
+//		read_index to track position of the input
+//		write_index to position the copy of valid char
+//		binary_count to count valid binary digits 
+//		last 'c' position to store the index of the last found 'c'
+//		c found flag when a 'c' is present
+//
+//	Scan for last found 'c' in the input
+//		loops through the buffer looking for a 'c' if found set found_c flag and
+//		add one to the current index within the buffer
+//
+//	Determine copy start position
+//		If 'c' is found after_c 
+//		if no then begin copyying from the buffer
 //
 //	The processing loop (loop_check) will continue to loop until the null terminator
 //	First - loads in the current char 
 //	Goes through the cases:
-//		'c' - Jumps to verify this command "check_command"
 //		'q' - Jumps to verify this command "check_command"
 //		'0' - Jumps to process the binary digit
 //		'1' - Jumps to process the binary digit
@@ -36,6 +48,7 @@
 //		Then moves to the next char
 //	  If: it is within the buffers bounds the binary will continue on the main loop
 //	  else:  Jumps to the final result 	
+//	 Anything else in an invalid input
 //	
 //	check_result: 
 //	If - no binary digits are found then it is an invalid input
@@ -44,36 +57,13 @@
 //	checks first char again to look for 'c' or 'q'
 //	otherwise will return the valid binary code
 //	
-//	Invalid input - Set up pointers and counters 
-//			Replace each char in the buffer with null bytes 
-//			Moves to the next position 
-//			continues doing so until entire buffer is cleared
-//			
-//			calls the flush_buff
+//	Invalid input - Clears the buffer completely		
 //
 //			Return 3 is invalid input
 //
-//	found_clear: - Saves the buffer in memory
-//			Prepares the number 0 
-//			Goes through the buffer one position at a time and puts a 0 in 
-//			the current position
-//			Moves to the next positiona nd repeats until it has erased
-//			the entire buffer
-//
-//	Flush_buff - Save registers that are used 
-//		     Set the file descriptor for keyboard input
-//		     Set up a temp 1 byte buffer for reading char
-//		     
-//	flush_loop - Makes the system call to read 1 char from keyboard
-//		     check the result 
-//			if: read fails then break out of the loop
-//			if: the char reads a newline break out of the loop
-//			else: continue reading next char
-//		    Restore the registers we saved
-//		    Return to the calling function
 //	
 //
-//	Restore the original frame pointer and return address return to the calling function with the result code 	
+//	Restore the original frame pointer and return address return to the calling function with the result code 
 //	
 //********************************************************************************************************************
 .data
@@ -87,18 +77,41 @@ check_key:
  
    	STP     X29, X30, [SP, #-16]!	// Saves X29 and X30 to the stack
    	MOV     X29, SP			// sets frame pointer to SP
-    	MOV	X3, X1			// Store max length 
 
-	MOV	X2, 0			// index counter
-	MOV	X9, 0			// binary digit count
+    	MOV	X3, X1			// Store max length 
+	MOV	X2, #0			// Read index
+	MOV	X10, #0			// Write index
+	MOV	X2, #0			// index counter
+	MOV	X9, #0			// binary digit count
+	MOV	X12, #0			// last 'c' position
+	MOV	X13, #0			// found 'c' flag
+
+find_last_c:
+	LDRB	W4, [X0, X2]		// Loads byte at the current read  index 
+	CBZ	W4, finding_c		// null terminator
+	CMP	W4, #'c'		// compare current byte to 'c'
+	BEQ	found_c			// if equal then mark as found
+	ADD	X2, X2, #1		// Increment read index
+	CMP	X2, X3			// check for max length
+	B.LT	find_last_c		// if not continue 
+	B	finding_c		// else done scanning
+
+found_c:
+	MOV	X13, #1			// Set flag 'c' found
+	MOV	X12, X2			// Store position of 'c'
+	ADD	X12, X12, #1		// MOve to positon after 'c'
+	ADD	X2, X2, #1		// conitnue scanning to find last 'c'
+	CMP	X2, X3			
+	B.LT	find_last_c
+
+finding_c:
+	CMP	X13, #1			// Check to see if found 'c'
+	BEQ	after_c			// If yes copy after last c found
+	MOV	X2, #0			// if no 'c' found copy everything
 
 loop_check:
 	LDRB	W4, [X0, X2]		// loads in the current char
-	CBZ	W4, exit		// when it equals a null terminator it ends
-
-   	 // Check for 'c' - clear buffer
-   	 CMP     W4, #'c'		// compares char with 'c'
-   	 B.EQ    check_command		// if equal jump to check_command
+	CBZ	W4, done_copy		// when it equals a null terminator it ends
     
    	 // Check for 'q' - quit program  
    	 CMP     W4, #'q'		// compare char with 'q'
@@ -114,9 +127,13 @@ loop_check:
     
    	 // Check for newline - finish
     	CMP     W4, #'\n'		// compare char with '\n' newline
-   	B.EQ    check_result		// if equal jump to check_result
+   	B.EQ    done_copy		// if equal jump to check_result
     	
     	B handle_invalid		// Jump to handl_invalid for any other char
+
+after_c:
+	MOV	X2, X12			// start copying from position after last 'c'
+	B	loop_check		// jump to loop_check
 
 check_command:
 	ADD	X2, X2, #1		// Increments index to the next character
@@ -132,99 +149,48 @@ valid:
 	CMP	W4, #'c'		// compares with 'c'
 	B.EQ	found_clear		// if equal jump to found_clear
 	CMP	W4, #'q'		// compare with 'q'
-	B.EQ	found_quit		// if equal jump to found_quit
+	B.EQ	valid_quit		// if equal jump to valid_quit
 
 process_bin:
-	// If it over 16 digits then skip these digits
-	CMP	X9, #16			// Compare to binary cound with 16
-	B.GE	skip_digit		// If greater than or equal to 16 jump to skip digit
-	ADD	X9, X9, #1		// increments the binary count
-
-skip_digit:
-	ADD	X2, X2, #1		// Increment char index
-	CMP	X2, X3			// compare index with max_lenght
-	B.LT	loop_check		// If less than continue loop
-	B	check_result		// Jumps to check_result if not
-
-check_result:
-	CBZ	X9, handle_invalid 	// If no binary digits found then jump to handle_invalid
-	LDRB	W4, [X0, #0]	   	// laod first char of the buffer
-	CMP	W4, #'c'		// compare with 'c'
-	B.EQ	found_clear		// if equal jump to found_clear
-	CMP	W4, #'q'		// compare with 'q'
-	B.EQ	found_quit		// if equal jump to found_quit
-	
-	MOV	X0, #0			// sets return code to 0 
-	B exit				// jump to exit
-
-found_clear:
-	MOV	X5, X0			// buffer pointer
-	MOV	X6, #0			// null byte
-	MOV	X7, #0			// index
-clear:
-	STRB	W6, [X5, X7]		// clear buffer
-	ADD	X7, X7, #1		// increments the clearing index to move to next char
-	CMP	X7, X3			// compares current index with max buffer length
-	B.LT	clear			// if index is less than max length continue to loop
-	
-	MOV	X0, #2			// set return code to 2 
-	B	exit			// branch to exit to retunr from function
-	
-found_quit:
-	MOV	X0, #1			// Set return code to 1
+	STRB	W4, [X0, X10]		// Store valid char at write index
+	ADD	X10, X10, #1		// Increment write index
+	ADD	X9, X9, #1		// increment binary digit count
+	ADD	X2, X2, #1		// increment read index
+	B	loop_check		// Jump back to loop_check
+done_copy:
+	MOV	W4, #0			
+	STRB	W4, [X0, X10]		// Null terminate the buffer		
+	CBZ	X9, handle_invalid	// If no binary digits then invalid
+	BEQ	found_clear		// if 'c' is found jump to found_clear
+	MOV	X0, #0			// Normal binary input
 	B	exit			// Jump to exit
 
+check_quit:
+	ADD	X2, X2, #1		// Check next char to confirm quit
+	LDRB	W4, [X0, X2]		// W4 = 'q'
+	CBZ	W4, valid_quit		// Compare to 0
+	CMP	W4, #'\n'		// if next char is newline valid quit
+	BEQ	valid_quit
+	B	handle_invalid		// if there are more char after then invalid
+	
+valid_quit:
+	MOV	X0, #1			// quit code
+	B	exit
+found_clear:
+	MOV	X0, #2			// Buffer cleared/processed after 'c'
+	B	exit
 handle_invalid:
-	MOV	X5, X0			// Store buffer pointer to X5
-	MOV	X6, #0			// Set null byte valyue in X6
-	MOV	X7, #0			// Initialize clear index to 0
-
-
-clear_loop:
-	STRB	W6, [X5, X7]		// store null byte at buffer [X7]
-	ADD	X7, X7, #1		// Increment clear index
-	CMP	X7, X3			// compare clear inxed with max_length
-	B.LT	clear_loop		// if less than continue clearing
-
-	BL	flush_buff		// call the flush_buff function 
-	MOV	X0, #3			// set return code to 3
-	B	exit			// jump to exit
+	MOV	X5, X0			// Clear buffer on invalid input
+	MOV	X6, #0
+	MOV	X7, #0
+clear_invalid:
+	STRB	W6, [X5, X7]		// Write null byte to buffer
+	ADD	X7, X7, #1
+	CMP	X7, X3
+	B.LT	clear_invalid
 	
-
-flush_buff:
-	STP	X29, X30, [SP,#-16]!	// Push X29 and X30 onto the stack
-	MOV	X29, SP			// Set frame pointer
-	STP	X19, X20, [SP, #-16]!	// Push X19 and X20 onto stack
-
-	MOV	X19, #0			// Set STDin file descriptor 0 in X19
-	LDR	X20, =flush_char	// Load address of flush_char into X20
-
-flush_loop:
-	LDR	X1, =flush_char		// Set buffer address for read
-	MOV	X2, #1			// Set read length to 1 byte
-	MOV	X0, #0			// Set file descriptor to STDin
-	MOV	X8, #63			// Set syscall number for read
-	SVC	0			// execute read syscall
-	
-	CMP	X0, 0			// compare bytes read wth 0
-	B.LE	flush_done		// if less than or equal to jump to flush_done
-
-	LDR	X1, =flush_char		// Load flush_char into X1
-	LDRB	W7, [X1]		// Load char form flush_char buffer
-	CMP	W7, #10			// Compare with newline
-	B.EQ	flush_done		// If equal jump to flush_done
-	B	flush_loop		// otherwise continue
-	
-flush_done:
-	LDP	X19, X20, [SP], #16	// Restore X19 and X20 from stack
-	LDP	X29, X30, [SP], #16	// Restore X29 and X30 form stack
-	RET				// return from flush_buff function
-
-end:
-	MOV	X8, #93			
-	MOV	X0, #0
-	SVC	0
-
+	MOV	X0, #3			// Return code 3 for invalid input
+	B exit
 exit:
 	LDP	X29, X30, [SP], #16	// Restore X29 and X30 form stack
 	RET				// return from check_key function
