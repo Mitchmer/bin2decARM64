@@ -57,8 +57,8 @@ post_exit:
     	RET
 
 quit_program:
+        LDP X29, X30, [SP], #16
     	// Exit program
-    	MOV X8, #93                 
-    	MOV X0, #0                     	
-	SVC 0
+    	MOV X0, #1                  
+    	RET
 

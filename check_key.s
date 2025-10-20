@@ -177,7 +177,7 @@ valid_quit:
 	MOV	X0, #1			// quit code
 	B	exit
 found_clear:
-	MOV	X0, #2			// Buffer cleared/processed after 'c'
+	MOV	X0, #0			// Buffer cleared/processed after 'c'
 	B	exit
 handle_invalid:
 	MOV	X5, X0			// Clear buffer on invalid input

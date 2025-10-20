@@ -89,7 +89,11 @@ input_loop:
     LDR X0, =szBinaryBuffer         // load buffer into X0 for check_key input
     MOV X1, #BUFFER_SIZE            // prepare buffer size for check_key
     BL check_key                    // call check_key to process
-    
+   
+    // 0 valid
+    // 1 quit
+    // 2 clear
+    // 3 invalid
     CMP X0, #0                      // check value returned from check_key
     B.EQ process_string             // if it's a zero, string is valid and can be processed
     CMP X0, #1                      // check value returned from check_key if not zero
@@ -119,7 +123,12 @@ endif_negative:
 
     // TODO : implement post key prompt and check
 
-end_program:
+    LDR X0, =szPostKeyBuffer        // prepare buffer to pass to post key
+    BL post_key                     // go to post key function
+    CMP X0, #0                      // compare return code to 0
+    B.EQ input_loop                 // if it's a 0, go back to beginning of program
+                                    // otherwise, move to end of program
+end_program:                        
     // end program
     MOV X0, #0                      // prepare return code 0
     MOV X8, #SYS_EXIT               // prepare system call code for program exit
@@ -134,6 +143,7 @@ szPlus: .asciz "+"
 szArrowBuffer: .skip 4
 szBinaryBuffer: .skip BUFFER_SIZE   // buffer for string input
 szIntegerBuffer: .skip BUFFER_SIZE  // buffer for integer output
+szPostKeyBuffer: .skip 4            // buffer to pass to post key for user input
 szEOL: .asciz "\n"                  // newline character for display 
 
 .end                                // code body end    
