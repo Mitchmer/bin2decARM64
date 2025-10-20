@@ -24,58 +24,67 @@
 //***************************************************************************************
 
 .text
-.global getstringbin2dec
+.global getstring
 
-getstringbin2dec:
+getstring:
+    	STP   X29, X30, [SP, #-16]!  // Push frame pointer and LR
+    	STP   X19, X20, [SP, #-16]!  // Push X19 and X20 to the stack
+    	STP   X21, X22, [SP, #-16]!  // Push X21 and X22 to stack
+    	MOV   X29, SP                 // Set up frame pointer
 
-	STP	X19, X20, [SP, #-16]!	// push X19 and X20 to the stack
-	STP	X21, X30, [SP, #-16]!	// push X21 and LR to stack
-		
-	MOV	X19, X0			// X19 = buffer pointer
-	MOV	X20, X1			// X20 = buffer length
+    	MOV   X19, X0    // X19 = buffer pointer
+    	MOV   X20, X1    // X20 = buffer length
 	
-	MOV	X0, #0			// X0 = stdin
-	MOV	X1, X19			// X1 = buffer address in order to store input
-	SUB	X2, X20, #1		// X2 = max bytes that can be read
-	MOV	X8, #63			// X8 = read
-	SVC	#0			// reads input from the KBD
+   	MOV   X0, #0     // X0 = stdin (fd 0)
+    	MOV   X1, X19    // X1 = buffer address
 
-	MOV	X21, X0			// Stores the bytes read into X21 
-	
-	CBZ	X21, finish		// If no bytes are left then jumps to finish
+input:
+    	SUB   X2, X20, #1    // X2 = max bytes that can be read (leave space for null)
+    	MOV   X8, #63        // X8 = read syscall number
+    	SVC   0              // reads input from stdin
 
-	MOV	X22, #0			// index counter
+    	MOV   X21, X0        // Stores the bytes read into X21
+    	CBZ   X21, finish    // If no bytes read, jump to finish
 
-	MOV	X1, X19
-	MOV	X2, X21
-	MOV	X3, X20
-	BL	check_key
-	
-	MOV	X21, X2
-	
+    	MOV   X22, #0        // index counter
+
+    	// Call check_key to validate input
+    	MOV   X0, X19        // buffer pointer
+    	MOV   X1, X20        // buffer length
+    	BL    check_key
+
+    	// After check_key, continue processing
+    	MOV   X22, #0        // Reset index counter for newline check
+
 newline_check:
-	
-	CMP	X22, X21		// checks to see if reached end of input
-	B.GE	finish			// if so then goes to finish
-	
-	LDRB	W23, [X19, X22]		// loads current character
-	CMP	W23, #'\n'		// newline
-	B.EQ	found_newline		// if there is a newline then go to found_newline
-	ADD	X22, X22, #1		// increments the index
-	B	newline_check		// loops back
-	
-found_newline:
-	
-	MOV	W23, #0			// null terminator
-	STRB	W23, [X19, X22]		// replaces '\n' to '\0'
-	B	finish			// Goes to finish
-	
-finish:
-	
-	MOV	W23, #0			
-	STRB	W23, [X19, X21]		// terminates after the last char
+    	CMP   X22, X21       // checks to see if reached end of input
+    	B.GE  finish         // if so then goes to finish
 
-	MOV 	X0, X19			// restores X0 to point at the buffer
-	
-	LDP	X29, X30, [SP], #16	// adjusts the stack by restoring LR
-	RET
+    	LDRB  W23, [X19, X22]    // loads current character
+    	CMP   W23, #'\n'         // check for newline
+    	B.EQ  found_newline      // if there is a newline then go to found_newline
+
+    	ADD   X22, X22, #1       // increments the index
+    	B     newline_check      // loops back
+
+found_newline:
+    	MOV   W23, #0            // null terminator
+    	STRB  W23, [X19, X22]    // replaces '\n' with '\0'
+    	B     finish             // Goes to finish
+
+finish:
+    	// Null terminate the string at the correct position
+    	CMP   X21, X20           // Check if we read up to buffer size
+    	B.LT  store_null
+    	SUB   X21, X20, #1       // Ensure we don't overflow
+
+store_null:
+    	MOV   W23, #0
+    	STRB  W23, [X19, X21]    // null terminate after last char
+
+    	MOV   X0, X19            // return buffer pointer
+
+    	LDP   X21, X22, [SP], #16  // Restore X21, X22
+    	LDP   X19, X20, [SP], #16  // Restore X19, X20
+    	LDP   X29, X30, [SP], #16  // Restore frame pointer and LR
+    	RET
