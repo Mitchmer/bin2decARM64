@@ -129,7 +129,7 @@ loop_check:
     	CMP     W4, #'\n'		// compare char with '\n' newline
    	B.EQ    done_copy		// if equal jump to check_result
     	
-    	B handle_invalid		// Jump to handl_invalid for any other char
+    	B valid		// Jump to handl_invalid for any other char
 
 after_c:
 	MOV	X2, X12			// start copying from position after last 'c'
