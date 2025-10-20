@@ -83,18 +83,21 @@ _start:
 input_loop:
     LDR X0, =szInitialInputPrompt 
     BL putstring                    // display prompt
+    LDR X0, =szBinaryBuffer         // prepare binary string buffer for getstring
+    BL getstring
 
-    // TODO : remove comments after getstring completion
-    //LDR X0, =szBinaryBuffer         // load buffer into X0 for getstring input
-    //MOV X1, #BUFFER_SIZE            // prepare buffer size for getstring
-    //BL getstringbin2dec             // call getstring for input
+    LDR X0, =szBinaryBuffer         // load buffer into X0 for check_key input
+    MOV X1, #BUFFER_SIZE            // prepare buffer size for check_key
+    BL check_key                    // call check_key to process
+    
+    CMP X0, #0                      // check value returned from check_key
+    B.EQ process_string             // if it's a zero, string is valid and can be processed
+    CMP X0, #1                      // check value returned from check_key if not zero
+    B.EQ end_program                // it it's a 1, terminate program
+    B input_loop                    // if anything else, jump back to beginning of loop
 
-    // TODO : delete this test section after getstring completion
-    LDR X0, =szTestString
-
-    // TODO : something is returned, maybe in X0?
-    // TODO : X0 is loaded with the binary c-string before calling bincstr2int
-
+process_string:                     // begin processing binary string
+    LDR X0, =szBinaryBuffer         // load buffer for bincstr2int
     BL bincstr2int                  // convert binary c-string to integer
     MOV X19, X0                     // preserve integer
     LDR X0, =szArrow                // prepare arrow for display
@@ -116,6 +119,7 @@ endif_negative:
 
     // TODO : implement post key prompt and check
 
+end_program:
     // end program
     MOV X0, #0                      // prepare return code 0
     MOV X8, #SYS_EXIT               // prepare system call code for program exit
