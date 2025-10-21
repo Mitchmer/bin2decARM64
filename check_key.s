@@ -106,7 +106,7 @@ found_c:
 
 finding_c:
 	CMP	X13, #1			// Check to see if found 'c'
-	BEQ	after_c			// If yes copy after last c found
+	B.EQ	after_c			// If yes copy after last c found
 	MOV	X2, #0			// if no 'c' found copy everything
 
 loop_check:
@@ -115,7 +115,7 @@ loop_check:
     
    	 // Check for 'q' - quit program  
    	 CMP     W4, #'q'		// compare char with 'q'
-   	 B.EQ    check_command		// if equal, jump to check_command
+   	 B.EQ    check_quit		// if equal, jump to check_quit
     
    	 // Check for '1' - store binary digit
    	 CMP     W4, #'1' 		// compare char with '1'
@@ -161,7 +161,7 @@ done_copy:
 	MOV	W4, #0			
 	STRB	W4, [X0, X10]		// Null terminate the buffer		
 	CBZ	X9, handle_invalid	// If no binary digits then invalid
-	BEQ	found_clear		// if 'c' is found jump to found_clear
+	B.EQ	found_clear		// if 'c' is found jump to found_clear
 	MOV	X0, #0			// Normal binary input
 	B	exit			// Jump to exit
 
@@ -170,7 +170,7 @@ check_quit:
 	LDRB	W4, [X0, X2]		// W4 = 'q'
 	CBZ	W4, valid_quit		// Compare to 0
 	CMP	W4, #'\n'		// if next char is newline valid quit
-	BEQ	valid_quit
+	B.EQ	valid_quit
 	B	valid_quit		// if there are more char after then invalid
 	
 valid_quit:
