@@ -1,4 +1,7 @@
-// Set up the information on the stack
+//****************************************************************************************
+// Osvaldo Medina - 10/20/25
+//
+//  Set up the information on the stack
 // Then await for an input
 // Reads only one char from the user
 // If char is - 'q' then shut down program
@@ -12,6 +15,7 @@
 //	Afterwards returns back to the program
 //	If 'q' - program ends completely 
 //
+//*******************************************************************************************
 .data
 flush_char:    .byte 0
 
@@ -19,7 +23,7 @@ flush_char:    .byte 0
 .global post_key
 
 post_key:
-        STP X19, X20, [SP, #-16]!             // preserve X19, X20 to stack
+        STP X19, X20, [SP, #-16]!       // preserve X19, X20 to stack
         MOV X19, X0                     // move buffer pointer to X19
         MOV X20, X1                     // move buffer length to X20
 	
@@ -28,7 +32,7 @@ post_key:
  
 wait_input:
        	MOV X0, SP                  	// Temporary buffer on stack
-    	MOV X1, #4                  	// Read max 2 bytes 
+    	MOV X1, #4                  	// Read max 4 bytes 
     	BL getstring                	// Call getstring
 
     	LDRB W4, [SP]               	// Load entered character

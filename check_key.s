@@ -1,4 +1,6 @@
 //****************************************************************************************************************
+// Osvaldo Medina - 10/20/25
+//
 //  Pseudocode:
 //	Function - check_key
 //	Input: X0 = buffer pointer, X1 = max length
@@ -18,6 +20,11 @@
 //		last 'c' position to store the index of the last found 'c'
 //		c found flag when a 'c' is present
 //
+//	Scan for q if q is found then jump to valid_exit to quit
+//	program immediately
+//	 else - continue to scan for c 
+//	
+//
 //	Scan for last found 'c' in the input
 //		loops through the buffer looking for a 'c' if found set found_c flag and
 //		add one to the current index within the buffer
@@ -29,7 +36,7 @@
 //	The processing loop (loop_check) will continue to loop until the null terminator
 //	First - loads in the current char 
 //	Goes through the cases:
-//		'q' - Jumps to verify this command "check_command"
+//		'q' - Jumps to verify this command valid_exit
 //		'0' - Jumps to process the binary digit
 //		'1' - Jumps to process the binary digit
 //		'\n' - This determines the final result
@@ -85,6 +92,23 @@ check_key:
 	MOV	X9, #0			// binary digit count
 	MOV	X12, #0			// last 'c' position
 	MOV	X13, #0			// found 'c' flag
+
+check_q:
+	MOV	X2, #0			// Reset read index for q
+
+search_q:
+	LDRB	W4, [X0, X2]		// Loads byte at current index
+	CBZ	W4, no_q		// If null terminator, no q found
+	
+	CMP	W4, #'q'		// Check if char is 'q'
+	B.EQ	valid_quit		// Quit immediately
+
+	ADD	X2, X2, #1		// Increment read index
+	CMP	X2, X3			// check for max length
+	B.LT	search_q		
+
+no_q:
+	MOV	X2, #0			// Reset read index to process now
 
 find_last_c:
 	LDRB	W4, [X0, X2]		// Loads byte at the current read  index 
