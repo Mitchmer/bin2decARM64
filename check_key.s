@@ -90,7 +90,7 @@ find_last_c:
 	LDRB	W4, [X0, X2]		// Loads byte at the current read  index 
 	CBZ	W4, finding_c		// null terminator
 	CMP	W4, #'c'		// compare current byte to 'c'
-	BEQ	found_c			// if equal then mark as found
+	B.EQ	found_c			// if equal then mark as found
 	ADD	X2, X2, #1		// Increment read index
 	CMP	X2, X3			// check for max length
 	B.LT	find_last_c		// if not continue 
@@ -115,7 +115,7 @@ loop_check:
     
    	 // Check for 'q' - quit program  
    	 CMP     W4, #'q'		// compare char with 'q'
-   	 B.EQ    check_quit		// if equal, jump to check_quit
+   	 B.EQ    valid_quit		// if equal, jump to check_quit
     
    	 // Check for '1' - store binary digit
    	 CMP     W4, #'1' 		// compare char with '1'
@@ -129,7 +129,7 @@ loop_check:
     	CMP     W4, #'\n'		// compare char with '\n' newline
    	B.EQ    done_copy		// if equal jump to check_result
     	
-    	B check_quit		// Jump to handl_invalid for any other char
+    	B handle_invalid		// Jump to handl_invalid for any other char
 
 after_c:
 	MOV	X2, X12			// start copying from position after last 'c'
