@@ -2,7 +2,7 @@
 //  Mitch Merrell
 //  CS3B - bincstr2int function
 //  Date Created: 10/10/2025
-//  Date Last Modified: 10/13/2025
+//  Date Last Modified: 10/21/2025
 //============================================================================
 
 .global bincstr2int             // provide global access to function
