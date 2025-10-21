@@ -19,10 +19,13 @@ flush_char:    .byte 0
 .global post_key
 
 post_key:
+        STP X19, X20, [SP, #-16]!             // preserve X19, X20 to stack
+        MOV X19, X0                     // move buffer pointer to X19
+        MOV X20, X1                     // move buffer length to X20
+	
     	STP X29, X30, [SP, #-16]!   	// Save the frame pointer and return address on stack
     	MOV X29, SP			// Set up new frame pointer
-	
-	
+ 
 wait_input:
        	MOV X0, SP                  	// Temporary buffer on stack
     	MOV X1, #4                  	// Read max 2 bytes 
@@ -32,22 +35,23 @@ wait_input:
 
     	
     	CMP W4, #'q'			// compares to 'q'
-    	BEQ quit_program		// If equal jump to quit_program
+    	B.EQ quit_program		// If equal jump to quit_program
 
        	CMP W4, #'c'			// compare to 'c'
-    	BEQ clear_buffer		// If equal jump to clear_buffer
+    	B.EQ clear_buffer		// If equal jump to clear_buffer
 
       	B wait_input			// else jump to wait_input
 
 clear_buffer:
-       	MOV X5, X2                  	// X2 = pointer to buffer
+        
+       	MOV X5, X19                  	// X2 = pointer to buffer
     	MOV X6, #0                  	// Zero
     	MOV X7, #0                  	// Index
 clear_loop:
 	LDRB W8, [X5, X7]		// load byte
        	STRB W6, [X5, X7]           	// Set byte to 0
     	ADD X7, X7, #1
-    	CMP X7, X3                   	// X3 = buffer length
+    	CMP X7, X20                   	// X3 = buffer length
     	B.LT clear_loop
 
 	B post_exit
@@ -55,10 +59,13 @@ clear_loop:
 post_exit:
     	// Return to main to loop again
     	LDP X29, X30, [SP], #16
+        LDR X19, [SP], #16      // restore X19
+        MOV X0, #0
     	RET
 
 quit_program:
         LDP X29, X30, [SP], #16
+        LDP X19, X20, [SP], #16      // restore X19, X20
     	// Exit program
     	MOV X0, #1                  
     	RET

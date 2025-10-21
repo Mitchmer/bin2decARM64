@@ -127,6 +127,7 @@ post_loop:
     LDR X0, =szPostKeyPrompt        // prepare post-conversion prompt
     BL putstring                    // display post-conversion prompt to user
     LDR X0, =szBinaryBuffer        // prepare buffer to pass to post key
+    MOV X1, #BUFFER_SIZE
     BL post_key                     // go to post key function
     CMP X0, #0                      // compare return code to 0
     B.EQ input_loop                 // if it's a 0, go back to beginning of program
