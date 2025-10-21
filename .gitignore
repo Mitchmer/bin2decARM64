@@ -4,4 +4,5 @@
 *.lib
 *.a
 *.backup
+*.swp
 Makefile

@@ -1,5 +1,5 @@
 // Osvaldo Medina
-// CS3B - Lab6-1 - getstring
+// CS3B - Lab6-1 - getstringbin2dec
 // 10/11/25
 //*****************************************************************************************
 // getstring
@@ -24,9 +24,9 @@
 //***************************************************************************************
 
 .text
-.global getstring
+.global getstringbin2dec
 
-getstring:
+getstringbin2dec:
     	STP   X29, X30, [SP, #-16]!  // Push frame pointer and LR
     	STP   X19, X20, [SP, #-16]!  // Push X19 and X20 to the stack
     	STP   X21, X22, [SP, #-16]!  // Push X21 and X22 to stack

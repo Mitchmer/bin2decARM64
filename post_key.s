@@ -25,7 +25,7 @@ post_key:
 	
 wait_input:
        	MOV X0, SP                  	// Temporary buffer on stack
-    	MOV X1, #2                  	// Read max 2 bytes 
+    	MOV X1, #4                  	// Read max 2 bytes 
     	BL getstring                	// Call getstring
 
     	LDRB W4, [SP]               	// Load entered character

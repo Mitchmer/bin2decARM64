@@ -123,7 +123,10 @@ endif_negative:
 
     // TODO : implement post key prompt and check
 
-    LDR X0, =szPostKeyBuffer        // prepare buffer to pass to post key
+post_loop:
+    LDR X0, =szPostKeyPrompt        // prepare post-conversion prompt
+    BL putstring                    // display post-conversion prompt to user
+    LDR X0, =szBinaryBuffer        // prepare buffer to pass to post key
     BL post_key                     // go to post key function
     CMP X0, #0                      // compare return code to 0
     B.EQ input_loop                 // if it's a 0, go back to beginning of program
@@ -138,7 +141,8 @@ end_program:
 
 szTestString: .asciz "1000000000000000" // -32768
 szInitialInputPrompt: .asciz "Enter a sequence of binary digits, 'c' to clear, and/or 'q' to quit: "
-szArrow: .asciz " -> "
+szPostKeyPrompt: .asciz "Enter a 'c' to start over, or 'q' to quit: "
+szArrow: .asciz "-> "
 szPlus: .asciz "+"
 szArrowBuffer: .skip 4
 szBinaryBuffer: .skip BUFFER_SIZE   // buffer for string input
