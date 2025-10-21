@@ -112,11 +112,7 @@ finding_c:
 loop_check:
 	LDRB	W4, [X0, X2]		// loads in the current char
 	CBZ	W4, done_copy		// when it equals a null terminator it ends
-    
-   	 // Check for 'q' - quit program  
-   	 CMP     W4, #'q'		// compare char with 'q'
-   	 B.EQ    valid_quit		// if equal, jump to check_quit
-    
+        
    	 // Check for '1' - store binary digit
    	 CMP     W4, #'1' 		// compare char with '1'
   	 B.EQ    process_bin		// if equal jump to process_bin
@@ -124,7 +120,10 @@ loop_check:
    	 // Check for '0' - store binary digit
    	 CMP     W4, #'0' 		// compare char with '0'
    	 B.EQ    process_bin		// if equal jump to process_bin
-    
+   
+	CMP	W4, #'q'		// compare char with 'q'
+	B.EQ	valid_quit		// if equal, jump to check_quit	
+ 
    	 // Check for newline - finish
     	CMP     W4, #'\n'		// compare char with '\n' newline
    	B.EQ    done_copy		// if equal jump to check_result
