@@ -136,8 +136,6 @@ finding_c:
 loop_check:
 	LDRB	W4, [X0, X2]		// loads in the current char
 	CBZ	W4, done_copy		// when it equals a null terminator it ends
-        CMP	W4, #'q'		// compare char with 'q'
-	B.EQ	exit
 
    	// Check for '1' - store binary digit
    	CMP     W4, #'1' 		// compare char with '1'
@@ -156,14 +154,6 @@ loop_check:
 after_c:
 	MOV	X2, X12			// start copying from position after last 'c'
 	B	loop_check		// jump to loop_check
-
-check_command:
-	ADD	X2, X2, #1		// Increments index to the next character
-	LDRB	W4, [X0, X2]		// Loads next char from the buffer
-	CBZ	W4, valid		// If null terminator then jump to valid
-	CMP	W4, #'\n'		// compares to newline
-	B.EQ	valid			// If newline then jump to valid
-	B	handle_invalid		// anything else is handle_invalid
 
 valid:
 	// Check the command
