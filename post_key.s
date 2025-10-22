@@ -1,6 +1,14 @@
-//****************************************************************************************
-// Osvaldo Medina - 10/20/25
-//
+//***************************************************************************
+// Osvaldo Medina 
+// CS3B - post_key function
+// Date: 10/21/2015
+//***************************************************************************
+// The post_key function handles the post condition of what the user would
+// like to do after the conversion is handled. The user has the option of 
+// either 'c' or 'q'. When the user inputs 'q' this will terminate the 
+// program. When the user inputs a 'c' this will clear the buffer. Then
+// return back to the bin2dec program
+//***************************************************************************
 //  Set up the information on the stack
 // Then await for an input
 // Reads only one char from the user
@@ -15,14 +23,14 @@
 //	Afterwards returns back to the program
 //	If 'q' - program ends completely 
 //
-//*******************************************************************************************
-.data
-flush_char:    .byte 0
+//***************************************************************************
+.data					// start of data section
+flush_char:    .byte 0			// flush_char = 0
+	
+.text					// start of code section
+.global post_key			// provide global access to function
 
-.text
-.global post_key
-
-post_key:
+post_key:				// function start
         STP X19, X20, [SP, #-16]!       // preserve X19, X20 to stack
         MOV X19, X0                     // move buffer pointer to X19
         MOV X20, X1                     // move buffer length to X20
@@ -30,7 +38,7 @@ post_key:
     	STP X29, X30, [SP, #-16]!   	// Save the frame pointer and return address on stack
     	MOV X29, SP			// Set up new frame pointer
  
-wait_input:
+wait_input:				// if 'q' - quit and if 'c' - clear
        	MOV X0, SP                  	// Temporary buffer on stack
     	MOV X1, #4                  	// Read max 4 bytes 
     	BL getstring                	// Call getstring
@@ -46,31 +54,31 @@ wait_input:
 
       	B wait_input			// else jump to wait_input
 
-clear_buffer:
+clear_buffer:				// clears the buffer
         
        	MOV X5, X19                  	// X2 = pointer to buffer
     	MOV X6, #0                  	// Zero
     	MOV X7, #0                  	// Index
-clear_loop:
+clear_loop:				// sets every byte to 0
 	LDRB W8, [X5, X7]		// load byte
        	STRB W6, [X5, X7]           	// Set byte to 0
     	ADD X7, X7, #1
     	CMP X7, X20                   	// X3 = buffer length
-    	B.LT clear_loop
+    	B.LT clear_loop			// If less than buffer length loop again to load next byte
 
-	B post_exit
-
-post_exit:
+	B post_exit			// Jump to post_exit
+	
+post_exit:				// Exits the function
     	// Return to main to loop again
-    	LDP X29, X30, [SP], #16
-        LDR X19, [SP], #16      // restore X19
-        MOV X0, #0
-    	RET
+    	LDP X29, X30, [SP], #16		// Restore frame pointer and link register
+        LDR X19, [SP], #16      	// restore X19
+        MOV X0, #0			// Set return value to 0
+    	RET				// Return to function
 
-quit_program:
-        LDP X29, X30, [SP], #16
-        LDP X19, X20, [SP], #16      // restore X19, X20
+quit_program:				// Exits the function
+        LDP X29, X30, [SP], #16		// Restore frame pointer and line register
+        LDP X19, X20, [SP], #16      	// restore X19, X20
     	// Exit program
-    	MOV X0, #1                  
-    	RET
+    	MOV X0, #1                  	// Set return value to 1
+    	RET				// Exit program
 
