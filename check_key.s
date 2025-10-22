@@ -95,7 +95,7 @@ check_key:				// function start
    	STP     X29, X30, [SP, #-16]!	// Saves X29 and X30 to the stack
    	MOV     X29, SP			// sets frame pointer to SP
 
-    	MOV	X3, X1			// Store max length 
+    MOV	X3, X1			// Store max length 
 	MOV	X2, #0			// Read index
 	MOV	X10, #0			// Write index
 	MOV	X2, #0			// index counter
@@ -156,10 +156,10 @@ loop_check:				// looks for valid char such as '0' or '1' if not then invalid
    	B.EQ    process_bin		// if equal jump to process_bin
     
    	// Check for newline - finish
-    	CMP     W4, #'\n'		// compare char with '\n' newline
+    CMP     W4, #'\n'		// compare char with '\n' newline
    	B.EQ    done_copy		// if equal jump to check_result
     	
-    	B handle_invalid		// Jump to handl_invalid for any other char
+    B handle_invalid		// Jump to handl_invalid for any other char
 
 after_c:				// copys anything after the last found 'c'
 	MOV	X2, X12			// start copying from position after last 'c'
